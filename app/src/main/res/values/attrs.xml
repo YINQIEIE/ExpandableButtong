@@ -5,6 +5,11 @@
         <attr name="circle_btn_color" format="reference|color" />
         <attr name="android:textSize" />
         <attr name="android:textColor" />
+        <attr name="circle_position" format="enum">
+            <enum name="left" value="0" />
+            <enum name="right" value="1" />
+        </attr>
+
     </declare-styleable>
 
 </resources>

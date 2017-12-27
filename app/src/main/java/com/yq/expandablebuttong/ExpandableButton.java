@@ -52,6 +52,8 @@ public class ExpandableButton extends View {
     private int bgAnimationTime = 300;
     private int textAnimationTime = 100;
 
+    private int circlePosition = 1;//默认右边
+
     public ExpandableButton(Context context) {
         this(context, null);
     }
@@ -68,6 +70,8 @@ public class ExpandableButton extends View {
         circlebgColor = a.getColor(R.styleable.ExpandableButton_circle_btn_color, circlebgColor);
         mtextSize = a.getDimensionPixelSize(R.styleable.ExpandableButton_android_textSize, mtextSize);
         textColor = a.getColor(R.styleable.ExpandableButton_android_textColor, textColor);
+        circlePosition = a.getInt(R.styleable.ExpandableButton_circle_position, circlePosition);
+        Log.i("animation", circlePosition + "");
         a.recycle();
     }
 
@@ -111,10 +115,17 @@ public class ExpandableButton extends View {
         bgRectF = new RectF();
 
         circleCenterPoint = new Point();
-        circleCenterPoint.set(mWidth - circleRadius - ringWidth, mHeight / 2);
+
         Paint.FontMetrics fontMet = mTextPaint.getFontMetrics();
         textBaseLineY = mHeight / 2 - (fontMet.ascent + fontMet.descent) / 2;
-        menuStartX = circleCenterPoint.y;
+
+        if (isLeft()) {//左边
+            circleCenterPoint.set(circleRadius + ringWidth, mHeight / 2);
+            menuStartX = circleCenterPoint.y * 2;
+        } else {//右边
+            circleCenterPoint.set(mWidth - circleRadius - ringWidth, mHeight / 2);
+            menuStartX = circleCenterPoint.y * 2;
+        }
         textRectWidth = (mWidth - 3 * circleCenterPoint.y) / menus.length;
     }
 
@@ -136,7 +147,10 @@ public class ExpandableButton extends View {
         String btnText = "打开";
         if (isOpen)
             btnText = "关闭";
-        canvas.drawText(btnText, mWidth - circleRadius - ringWidth, textBaseLineY, mTextPaint);
+        if (isLeft())
+            canvas.drawText(btnText, circleCenterPoint.x, textBaseLineY, mTextPaint);
+        else
+            canvas.drawText(btnText, mWidth - circleRadius - ringWidth, textBaseLineY, mTextPaint);
         startBreathing();
 
     }
@@ -147,12 +161,14 @@ public class ExpandableButton extends View {
         float touchX = event.getX();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (!isOpen && touchX < mWidth - mHeight)//未展开点击菜单区域不处理
+                if (!isOpen &&
+                        ((isLeft() && touchX > 2 * circleCenterPoint.y)
+                                || (!isLeft() && touchX < mWidth - mHeight)))//未展开点击菜单区域不处理
                     return false;
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (touchX > mWidth - mHeight) {//在圆形按钮的位置
+                if ((isLeft() && touchX < circleCenterPoint.y * 2) || (!isLeft() && touchX > mWidth - mHeight)) {//在圆形按钮的位置
                     if (isOpen)
                         close();
                     else
@@ -160,8 +176,8 @@ public class ExpandableButton extends View {
                 } else if (touchX < menuStartX) {
                     // to do nothing
                 } else {
-                    int position = (int) ((touchX - menuStartX) / textRectWidth);
-                    Toast.makeText(getContext(), "item clicked is " + menus[position], Toast.LENGTH_LONG).show();
+                    int clickPosition = (int) ((touchX - menuStartX) / textRectWidth);
+                    Toast.makeText(getContext(), "item clicked is " + menus[clickPosition], Toast.LENGTH_LONG).show();
                 }
                 break;
         }
@@ -169,17 +185,37 @@ public class ExpandableButton extends View {
         return true;
     }
 
+    /**
+     * 判断圆形按钮在左边还是右边
+     *
+     * @return
+     */
+    private boolean isLeft() {
+        return circlePosition == 0;
+    }
+
     private void open() {
         isOpen = true;
         isAnimating = true;
         ringPaint.setColor(bgColor);
-        bgAnimation = ValueAnimator.ofInt(mWidth - mHeight, 0);
+        int aniStartX = 0, aniEndX = 0;
+        if (isLeft()) {
+            aniStartX = circleCenterPoint.x * 2;//从圆形按钮右侧切线处开始，即 mHeight
+            aniEndX = mWidth;
+        } else {
+            aniStartX = mWidth - mHeight;
+            aniEndX = 0;
+        }
+        bgAnimation = ValueAnimator.ofInt(aniStartX, aniEndX);
         bgAnimation.setDuration(bgAnimationTime);
         bgAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int x = (int) animation.getAnimatedValue();
-                bgRectF.set(x, ringWidth, mWidth - ringWidth, mHeight - ringWidth);
+                if (isLeft())
+                    bgRectF.set(ringWidth, ringWidth, x, mHeight - ringWidth);
+                else
+                    bgRectF.set(x, ringWidth, mWidth - ringWidth, mHeight - ringWidth);
                 invalidate();
             }
         });
@@ -209,13 +245,24 @@ public class ExpandableButton extends View {
         isOpen = false;
         isAnimating = true;
         ringPaint.setColor(ringColor);
-        bgAnimation = ValueAnimator.ofInt(0, mWidth - mHeight);
+        int aniStartX = 0, aniEndX = 0;
+        if (isLeft()) {
+            aniStartX = mWidth;
+            aniEndX = circleCenterPoint.x * 2;//到圆形按钮的右侧切线位置停止动画
+        } else {
+            aniStartX = 0;
+            aniEndX = mWidth - mHeight;
+        }
+        bgAnimation = ValueAnimator.ofInt(aniStartX, aniEndX);
         bgAnimation.setDuration(bgAnimationTime);
         bgAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int x = (int) animation.getAnimatedValue();
-                bgRectF.set(x, ringWidth, mWidth - ringWidth, mHeight - ringWidth);
+                if (isLeft())
+                    bgRectF.set(ringWidth, ringWidth, x, mHeight - ringWidth);
+                else
+                    bgRectF.set(x, ringWidth, mWidth - ringWidth, mHeight - ringWidth);
                 invalidate();
             }
         });
@@ -250,12 +297,25 @@ public class ExpandableButton extends View {
         breathingAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                Log.i("button", "running" + animation.getAnimatedValue().toString());
                 ringPaint.setAlpha((int) animation.getAnimatedValue());
                 invalidate();
             }
         });
         breathingAnimation.start();
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (set.isRunning()) {
+            set.cancel();
+            set = null;
+        }
+        if (breathingAnimation != null) {
+            if (breathingAnimation.isRunning())
+                breathingAnimation.cancel();
+        }
+    }
+
 
 }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="200dp"
     android:gravity="center"
     tools:context="com.yq.expandablebuttong.MainActivity">
 
@@ -22,6 +22,27 @@
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_margin="10dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        app:circle_position="left" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:onClick="testClick"
+        android:text="hello"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <com.yq.expandablebuttong.ExpandableButton
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:textSize="16sp"
+        app:circle_position="right" />
 
 </FrameLayout>
