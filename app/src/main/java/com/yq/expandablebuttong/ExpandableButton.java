@@ -172,13 +172,14 @@ public class ExpandableButton extends View {
     private void open() {
         isOpen = true;
         isAnimating = true;
+        ringPaint.setColor(bgColor);
         bgAnimation = ValueAnimator.ofInt(mWidth - mHeight, 0);
         bgAnimation.setDuration(bgAnimationTime);
         bgAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int x = (int) animation.getAnimatedValue();
-                bgRectF.set(x, 0, mWidth, mHeight);
+                bgRectF.set(x, ringWidth, mWidth - ringWidth, mHeight - ringWidth);
                 invalidate();
             }
         });
@@ -207,13 +208,14 @@ public class ExpandableButton extends View {
     private void close() {
         isOpen = false;
         isAnimating = true;
+        ringPaint.setColor(ringColor);
         bgAnimation = ValueAnimator.ofInt(0, mWidth - mHeight);
         bgAnimation.setDuration(bgAnimationTime);
         bgAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int x = (int) animation.getAnimatedValue();
-                bgRectF.set(x, 0, mWidth, mHeight);
+                bgRectF.set(x, ringWidth, mWidth - ringWidth, mHeight - ringWidth);
                 invalidate();
             }
         });
