@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ExpandableButton">
+        <attr name="whole_bg_color" format="reference|color" />
+        <attr name="circle_btn_color" format="reference|color" />
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+    </declare-styleable>
+
+</resources>
