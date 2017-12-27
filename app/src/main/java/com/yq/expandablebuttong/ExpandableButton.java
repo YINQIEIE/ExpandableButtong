@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 /**
  * Created by Administrator on 2017/12/27.
- * @see http://blog.csdn.net/wbwjx/article/details/50583812
+ * see http://blog.csdn.net/wbwjx/article/details/50583812
  */
 
 public class ExpandableButton extends View {
