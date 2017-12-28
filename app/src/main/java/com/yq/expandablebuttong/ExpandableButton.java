@@ -13,7 +13,6 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -71,7 +70,6 @@ public class ExpandableButton extends View {
         mtextSize = a.getDimensionPixelSize(R.styleable.ExpandableButton_android_textSize, mtextSize);
         textColor = a.getColor(R.styleable.ExpandableButton_android_textColor, textColor);
         circlePosition = a.getInt(R.styleable.ExpandableButton_circle_position, circlePosition);
-        Log.i("animation", circlePosition + "");
         a.recycle();
     }
 
@@ -124,7 +122,7 @@ public class ExpandableButton extends View {
             menuStartX = circleCenterPoint.y * 2;
         } else {//右边
             circleCenterPoint.set(mWidth - circleRadius - ringWidth, mHeight / 2);
-            menuStartX = circleCenterPoint.y * 2;
+            menuStartX = circleCenterPoint.y;
         }
         textRectWidth = (mWidth - 3 * circleCenterPoint.y) / menus.length;
     }
